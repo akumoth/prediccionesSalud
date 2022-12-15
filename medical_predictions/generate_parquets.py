@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
-import seaborn as sns
 from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
 
 # Cargamos los datos
@@ -46,6 +44,10 @@ ohe_admission.rename(columns={'Other':'OtherDiseases'},inplace=True)
 hsptl_train_df = pd.concat([hsptl_train_df, ohe_admission], axis=1)
 hsptl_train_df.drop('health_conditions',axis=1, inplace=True)
 
+# Volvemos la variable objetivo en una variable categorica para posteriormente aplicar modelos de clasificación
+
+hsptl_train_df = hsptl_train_df.assign(StayLength=pd.cut(hsptl_train_df['Stay (in days)'],[0,8,999],labels=[0,1])).drop('Stay (in days)',axis=1)
+hsptl_train_df.drop(['Available Extra Rooms in Hospital','Department','Ward_Facility_Code','doctor_name','patientid'],axis=1,inplace=True)
 # Hacemos el mismo proceso con los datos de prueba
 
 enc = OrdinalEncoder()
@@ -76,6 +78,7 @@ ohe_admission.drop(['None'], axis=1, inplace=True)
 ohe_admission.rename(columns={'Other':'OtherDiseases'},inplace=True)
 hsptl_test_df = pd.concat([hsptl_test_df, ohe_admission], axis=1)
 hsptl_test_df.drop('health_conditions',axis=1, inplace=True)
+hsptl_test_df.drop(['Available Extra Rooms in Hospital','Department','Ward_Facility_Code','doctor_name','patientid'],axis=1,inplace=True)
 
 # Ya habiendo preparados los dataframes, los pasamos a un parquet para cargarlos después al generar nuestro modelo
 
